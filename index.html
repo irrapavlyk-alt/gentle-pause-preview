@@ -179,135 +179,238 @@ body { font-family:var(--gp-font); }
 .forward-arrow { visibility:hidden; pointer-events:none; }
 .forward-arrow.mvp-available { visibility:visible; pointer-events:auto; }
 </style>
-<style id="final-mobile-layout">
-/* ===== FINAL LOCKED MOBILE LAYOUT =====
-   Changes only:
-   - mobile outer geometry
-   - adaptive control row geometry
-   - welcome/closing hierarchy already approved above
-   The original master background image, olive/khaki color, Pause typography,
-   copy, internal content positions, transitions and calendar logic remain unchanged. */
+<style id="final-mobile-visual-update">
+/* ===== FINAL MOBILE VISUAL UPDATE =====
+   Locked: master background pixels, khaki/olive color, typography, copy,
+   internal card positions, transitions and calendar workflow.
+   Changed only: mobile card/controls geometry and adaptive nav layout. */
 
 html, body {
   overscroll-behavior:none;
 }
 
-@media (max-width:799px) {
+@media (max-width:1100px) {
   html, body {
+    margin:0;
     width:100%;
     height:100%;
     overflow:hidden !important;
   }
 
   body {
-    min-height:100dvh;
-    height:100dvh;
-  }
-
-  .frame {
     position:fixed;
     inset:0;
     width:100vw;
     height:100dvh;
-    min-height:0;
-    box-sizing:border-box;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    align-items:center;
-    gap:8px;
-    padding:
-      max(5px, env(safe-area-inset-top))
-      4px
-      max(5px, env(safe-area-inset-bottom));
-    overflow:hidden;
+    min-height:0 !important;
   }
 
-  /* The card now fills all remaining vertical room above the controls.
-     No new image is generated. The approved master is simply center-cropped.
-     A slight x-shift preserves the right-side light pattern more naturally. */
+  .screen {
+    position:fixed !important;
+    inset:0 !important;
+    width:100vw !important;
+    height:100dvh !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+  }
+
+  .frame {
+    position:absolute !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    box-sizing:border-box !important;
+
+    display:grid !important;
+    grid-template-rows:minmax(0,1fr) 48px !important;
+    gap:8px !important;
+
+    padding:
+      max(4px, env(safe-area-inset-top))
+      4px
+      max(4px, env(safe-area-inset-bottom)) !important;
+
+    overflow:hidden !important;
+    justify-items:stretch !important;
+    align-items:stretch !important;
+  }
+
   .card {
-    width:calc(100vw - 8px);
-    max-width:none;
-    height:auto;
-    min-height:0;
-    flex:1 1 auto;
-    aspect-ratio:auto;
-    background-size:cover;
-    background-position:53% center;
-    box-sizing:border-box;
+    width:100% !important;
+    max-width:none !important;
+    height:100% !important;
+    max-height:none !important;
+    min-height:0 !important;
+    aspect-ratio:auto !important;
+    margin:0 !important;
+
+    /* Original approved master image only; visual crop, no regeneration. */
+    background-size:cover !important;
+    background-position:55% center !important;
   }
 
   .controls {
-    width:calc(100vw - 8px);
-    max-width:none;
-    height:48px;
-    min-height:48px;
-    flex:0 0 48px;
-    box-sizing:border-box;
+    width:100% !important;
+    max-width:none !important;
+    height:48px !important;
+    min-height:48px !important;
+    margin:0 !important;
+    align-self:stretch !important;
   }
 
-  .controls.single {
-    grid-template-columns:minmax(0,1fr);
-  }
-
-  /* Runtime applies one of these states. No empty visual slot is reserved. */
+  .controls.single,
   .controls.nav-none {
-    grid-template-columns:minmax(0,1fr);
+    grid-template-columns:minmax(0,1fr) !important;
   }
   .controls.nav-back {
-    grid-template-columns:46px minmax(0,1fr);
+    grid-template-columns:46px minmax(0,1fr) !important;
   }
   .controls.nav-forward {
-    grid-template-columns:minmax(0,1fr) 46px;
+    grid-template-columns:minmax(0,1fr) 46px !important;
   }
   .controls.nav-both {
-    grid-template-columns:46px minmax(0,1fr) 46px;
+    grid-template-columns:46px minmax(0,1fr) 46px !important;
   }
 
   .controls .circle {
-    width:46px;
-    height:46px;
+    width:46px !important;
+    height:46px !important;
   }
 
-  /* Hidden means absent, not a faint placeholder. */
   .controls .circle.mvp-hidden {
     display:none !important;
   }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  .screen::-webkit-scrollbar,
+  .frame::-webkit-scrollbar {
+    display:none !important;
+    width:0 !important;
+    height:0 !important;
+  }
 }
 
-@media (max-width:799px) and (max-height:700px) {
+@media (max-width:1100px) and (max-height:700px) {
   .frame {
-    gap:6px;
+    grid-template-rows:minmax(0,1fr) 44px !important;
+    gap:6px !important;
     padding:
-      max(4px, env(safe-area-inset-top))
+      max(3px, env(safe-area-inset-top))
       3px
-      max(4px, env(safe-area-inset-bottom));
+      max(3px, env(safe-area-inset-bottom)) !important;
   }
-  .card,
+
   .controls {
-    width:calc(100vw - 6px);
+    height:44px !important;
+    min-height:44px !important;
   }
-  .controls {
-    height:44px;
-    min-height:44px;
-    flex-basis:44px;
+
+  .controls.nav-back {
+    grid-template-columns:42px minmax(0,1fr) !important;
   }
-  .controls.nav-back { grid-template-columns:42px minmax(0,1fr); }
-  .controls.nav-forward { grid-template-columns:minmax(0,1fr) 42px; }
-  .controls.nav-both { grid-template-columns:42px minmax(0,1fr) 42px; }
+  .controls.nav-forward {
+    grid-template-columns:minmax(0,1fr) 42px !important;
+  }
+  .controls.nav-both {
+    grid-template-columns:42px minmax(0,1fr) 42px !important;
+  }
+
   .controls .circle {
-    width:42px;
-    height:42px;
+    width:42px !important;
+    height:42px !important;
   }
 }
 </style>
 
 
-<style id="local-preview-fallback">
-/* Local Safari preview safety: before runtime initializes, show Welcome.
-   Once JS is ready, the normal hosted MVP visibility rules take over. */
-body:not(.mvp-ready) #welcome { display:block !important; z-index:20; }
+<style id="gp-mobile-viewport-final">
+@media (max-width:1100px) {
+  html, body, .stage {
+    width:100vw !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    max-height:100dvh !important;
+    overflow:hidden !important;
+  }
+
+  body, .stage {
+    position:fixed !important;
+    inset:0 !important;
+  }
+
+  .screen {
+    position:fixed !important;
+    inset:0 !important;
+    width:100vw !important;
+    height:100dvh !important;
+    min-height:0 !important;
+    max-height:100dvh !important;
+    overflow:hidden !important;
+  }
+
+  .frame {
+    position:absolute !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+
+    display:grid !important;
+    grid-template-rows:minmax(0,1fr) 48px !important;
+    gap:8px !important;
+
+    /* Browser Safari already keeps its toolbar/status UI outside the page viewport.
+       Keep only the thin khaki frame requested around the experience. */
+    padding:4px !important;
+
+    overflow:hidden !important;
+  }
+
+  .card {
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    max-width:none !important;
+    max-height:none !important;
+    aspect-ratio:auto !important;
+    margin:0 !important;
+    background-size:cover !important;
+    background-position:55% center !important;
+  }
+
+  .controls {
+    width:100% !important;
+    max-width:none !important;
+    height:48px !important;
+    min-height:48px !important;
+    margin:0 !important;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  .stage::-webkit-scrollbar,
+  .screen::-webkit-scrollbar,
+  .frame::-webkit-scrollbar {
+    display:none !important;
+    width:0 !important;
+    height:0 !important;
+  }
+}
+
+/* Future PWA/standalone mode: respect the physical iPhone safe areas there,
+   without adding that large gap in ordinary Safari. */
+@media (max-width:1100px) and (display-mode: standalone) {
+  .frame {
+    padding:
+      max(4px, env(safe-area-inset-top))
+      4px
+      max(4px, env(safe-area-inset-bottom)) !important;
+  }
+}
 </style>
 
 </head>
@@ -1539,13 +1642,7 @@ body:not(.mvp-ready) #welcome { display:block !important; z-index:20; }
     }
 
     refreshNavigation();
-    try {
-      if (location.protocol !== "file:") {
-        history.replaceState(null, "", `#${id}`);
-      } else {
-        location.hash = id;
-      }
-    } catch (_) {}
+    history.replaceState(null, "", `#${id}`);
   }
 
   function isNewCalendarDay() {
