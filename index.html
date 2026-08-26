@@ -5,16 +5,6 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" name="viewport"/>
 <meta content="rgb(105,99,65)" name="theme-color"/>
-<meta content="V12.4" name="gentle-pause-build"/>
-<script>
-(function(){
-  try{
-    if((navigator.maxTouchPoints||0)>0 || ("ontouchstart" in window)){
-      document.documentElement.classList.add("gp-touch");
-    }
-  }catch(e){}
-})();
-</script>
 <title>Gentle Pause — Prototype V12</title>
 <style>
 :root {
@@ -262,7 +252,7 @@ body { font-family:var(--gp-font); }
 
 /* MOBILE = APP-LIKE SINGLE VIEWPORT
    Same external rectangle for Welcome / Today / Pause / Tomorrow / Final. */
-@media (max-width:1100px), (pointer:coarse){
+@media (max-width:799px){
   html,body{
     width:100%!important;
     height:100%!important;
@@ -350,7 +340,7 @@ body { font-family:var(--gp-font); }
 
 /* Short-height phones keep the same outer rectangle; only internal type
    follows the already-approved V4/V11 compact rule. */
-@media (max-width:1100px) and (max-height:700px), (pointer:coarse) and (max-height:700px){
+@media (max-width:799px) and (max-height:700px){
   .frame{grid-template-rows:minmax(0,1fr) 42px!important;gap:6px!important}
   .controls,.controls.single{height:42px!important;min-height:42px!important}
   .primary,.circle{height:42px!important;min-height:42px!important}
@@ -397,55 +387,66 @@ body.v12-preview-mode #v12-preview{display:flex}
 body.v12-preview-mode .frame{
   /* Harness overlays only; it does not change frame dimensions. */
 }
-/* V12.4 deterministic touch-device geometry.
-   Same approved V12 mobile layout, triggered by JS touch detection rather than media-query matching. */
-html.gp-touch,
-html.gp-touch body{
+
+/* =====================================================================
+   V14 — LOCKED MOBILE GEOMETRY
+   Source: approved clean-mobile-geometry-proof tested in real iPhone Safari.
+   Product behavior / copy / typography / background / workflow remain V12.1.
+   ===================================================================== */
+html,body{
   width:100%!important;
   height:100%!important;
   min-height:100%!important;
+  margin:0!important;
   overflow:hidden!important;
   overscroll-behavior:none!important;
   background:var(--outer)!important;
 }
-html.gp-touch body{
+body{
   position:fixed!important;
   inset:0!important;
 }
-html.gp-touch .stage{
+.stage{
   position:fixed!important;
   inset:0!important;
   width:100vw!important;
+  height:100vh!important;
   height:100dvh!important;
   min-height:100dvh!important;
   max-height:100dvh!important;
   overflow:hidden!important;
 }
-html.gp-touch .screen{
+.screen{
   position:fixed!important;
   inset:0!important;
   width:100vw!important;
+  height:100vh!important;
   height:100dvh!important;
   min-height:0!important;
   max-height:100dvh!important;
   overflow:hidden!important;
 }
-html.gp-touch .frame{
+.frame{
   position:absolute!important;
   inset:0!important;
   width:100%!important;
   height:100%!important;
   min-height:0!important;
   max-height:100%!important;
-  padding:max(5px,env(safe-area-inset-top)) 6px max(5px,env(safe-area-inset-bottom))!important;
+  padding:
+    max(6px,env(safe-area-inset-top))
+    7px
+    max(7px,env(safe-area-inset-bottom))!important;
   display:grid!important;
-  grid-template-rows:minmax(0,1fr) 46px!important;
+  grid-template-rows:minmax(0,1fr) 50px!important;
   gap:8px!important;
   align-items:stretch!important;
   justify-items:stretch!important;
   overflow:hidden!important;
 }
-html.gp-touch .card{
+.card{
+  position:relative!important;
+  inset:auto!important;
   width:100%!important;
   height:100%!important;
   min-width:0!important;
@@ -455,27 +456,129 @@ html.gp-touch .card{
   aspect-ratio:auto!important;
   margin:0!important;
   flex:none!important;
+  overflow:hidden!important;
   background-size:cover!important;
   background-position:center!important;
   box-shadow:none!important;
 }
-html.gp-touch .controls,
-html.gp-touch .controls.single{
+.controls,
+.controls.single,
+.controls.nav-back,
+.controls.nav-forward,
+.controls.nav-both{
   width:100%!important;
-  height:46px!important;
-  min-height:46px!important;
+  height:50px!important;
+  min-height:50px!important;
   max-width:none!important;
   margin:0!important;
   gap:8px!important;
 }
-html.gp-touch .primary,
-html.gp-touch .circle{
-  min-height:46px!important;
-  height:46px!important;
+.circle,
+.primary{
+  min-height:50px!important;
+  height:50px!important;
 }
-html.gp-touch .circle{width:46px!important}
-html.gp-touch .content{left:11.4%!important;right:10.8%!important}
-html.gp-touch .mid-copy{left:11.4%!important;right:11.4%!important}
+.circle{
+  width:50px!important;
+  min-width:50px!important;
+}
+.controls{grid-template-columns:minmax(0,1fr)!important}
+.controls.nav-back{grid-template-columns:50px minmax(0,1fr)!important}
+.controls.nav-forward{grid-template-columns:minmax(0,1fr) 50px!important}
+.controls.nav-both{grid-template-columns:50px minmax(0,1fr) 50px!important}
+
+@media (max-height:740px){
+  .frame{
+    grid-template-rows:minmax(0,1fr) 46px!important;
+    gap:6px!important;
+  }
+  .controls,
+  .controls.single,
+  .controls.nav-back,
+  .controls.nav-forward,
+  .controls.nav-both,
+  .circle,
+  .primary{
+    height:46px!important;
+    min-height:46px!important;
+  }
+  .circle{
+    width:46px!important;
+    min-width:46px!important;
+  }
+  .controls.nav-back{grid-template-columns:46px minmax(0,1fr)!important}
+  .controls.nav-forward{grid-template-columns:minmax(0,1fr) 46px!important}
+  .controls.nav-both{grid-template-columns:46px minmax(0,1fr) 46px!important}
+}
+
+@media (min-width:800px) and (hover:hover) and (pointer:fine){
+  body{
+    position:static!important;
+    inset:auto!important;
+  }
+  .stage{
+    width:100vw!important;
+    height:100vh!important;
+    height:100svh!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+  .screen{
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+  .frame{
+    position:static!important;
+    width:100%!important;
+    height:100%!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+    padding:
+      max(8px,env(safe-area-inset-top))
+      10px
+      max(48px,calc(env(safe-area-inset-bottom) + 40px))!important;
+  }
+  .card{
+    position:relative!important;
+    flex:0 0 auto!important;
+    width:min(92vw,520px,calc((100svh - 112px) * .66536))!important;
+    height:auto!important;
+    max-width:none!important;
+    max-height:calc(100svh - 112px)!important;
+    aspect-ratio:var(--ratio)!important;
+    background-size:cover!important;
+    background-position:center!important;
+    box-shadow:0 22px 58px rgba(24,27,15,.13)!important;
+  }
+  .controls,
+  .controls.single,
+  .controls.nav-back,
+  .controls.nav-forward,
+  .controls.nav-both{
+    width:min(92vw,520px,calc((100svh - 112px) * .66536))!important;
+    height:46px!important;
+    min-height:46px!important;
+    gap:10px!important;
+  }
+  .circle,
+  .primary{
+    min-height:46px!important;
+    height:46px!important;
+  }
+  .circle{
+    width:46px!important;
+    min-width:46px!important;
+  }
+  .controls{grid-template-columns:minmax(0,1fr)!important}
+  .controls.nav-back{grid-template-columns:46px minmax(0,1fr)!important}
+  .controls.nav-forward{grid-template-columns:minmax(0,1fr) 46px!important}
+  .controls.nav-both{grid-template-columns:46px minmax(0,1fr) 46px!important}
+}
 
 </style>
 
