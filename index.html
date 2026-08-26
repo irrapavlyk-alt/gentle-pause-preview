@@ -5,6 +5,16 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" name="viewport"/>
 <meta content="rgb(105,99,65)" name="theme-color"/>
+<meta content="V12.4" name="gentle-pause-build"/>
+<script>
+(function(){
+  try{
+    if((navigator.maxTouchPoints||0)>0 || ("ontouchstart" in window)){
+      document.documentElement.classList.add("gp-touch");
+    }
+  }catch(e){}
+})();
+</script>
 <title>Gentle Pause — Prototype V12</title>
 <style>
 :root {
@@ -387,6 +397,86 @@ body.v12-preview-mode #v12-preview{display:flex}
 body.v12-preview-mode .frame{
   /* Harness overlays only; it does not change frame dimensions. */
 }
+/* V12.4 deterministic touch-device geometry.
+   Same approved V12 mobile layout, triggered by JS touch detection rather than media-query matching. */
+html.gp-touch,
+html.gp-touch body{
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+  background:var(--outer)!important;
+}
+html.gp-touch body{
+  position:fixed!important;
+  inset:0!important;
+}
+html.gp-touch .stage{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  max-height:100dvh!important;
+  overflow:hidden!important;
+}
+html.gp-touch .screen{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100dvh!important;
+  min-height:0!important;
+  max-height:100dvh!important;
+  overflow:hidden!important;
+}
+html.gp-touch .frame{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:100%!important;
+  padding:max(5px,env(safe-area-inset-top)) 6px max(5px,env(safe-area-inset-bottom))!important;
+  display:grid!important;
+  grid-template-rows:minmax(0,1fr) 46px!important;
+  gap:8px!important;
+  align-items:stretch!important;
+  justify-items:stretch!important;
+  overflow:hidden!important;
+}
+html.gp-touch .card{
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:none!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+  margin:0!important;
+  flex:none!important;
+  background-size:cover!important;
+  background-position:center!important;
+  box-shadow:none!important;
+}
+html.gp-touch .controls,
+html.gp-touch .controls.single{
+  width:100%!important;
+  height:46px!important;
+  min-height:46px!important;
+  max-width:none!important;
+  margin:0!important;
+  gap:8px!important;
+}
+html.gp-touch .primary,
+html.gp-touch .circle{
+  min-height:46px!important;
+  height:46px!important;
+}
+html.gp-touch .circle{width:46px!important}
+html.gp-touch .content{left:11.4%!important;right:10.8%!important}
+html.gp-touch .mid-copy{left:11.4%!important;right:11.4%!important}
+
 </style>
 
 </head>
