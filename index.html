@@ -103,11 +103,12 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,.stage::-webkit-scrollbar,
       gap:8px;
     }
 
-    /* Composition refinement only.
-       Shorten the visible card from the TOP while preserving its bottom edge,
-       the grid row, the controls, and the successful adaptive bottom geometry. */
+    /* FINAL COMPOSITION BALANCE.
+       The successful lower edge + button position remain untouched.
+       Only the visible card top is moved down.
+       Adaptive across phone heights; no device/model dimensions. */
     .frame > .card{
-      --gp-card-top-trim:clamp(12px,1.8dvh,18px);
+      --gp-card-top-trim:clamp(36px,5.5dvh,52px);
       height:calc(100% - var(--gp-card-top-trim));
       margin-top:var(--gp-card-top-trim);
       align-self:end;

@@ -1,0 +1,36 @@
+GENTLE PAUSE — BALANCED FINAL
+
+BASE
+Successful Adaptive Final build (the version where the button reached its
+lowest safe, fully visible position).
+
+LOCKED LOWER GEOMETRY — UNCHANGED
+- adaptive reclaim logic unchanged
+- controls/button position unchanged
+- bottom safe-area behavior unchanged
+- controls height unchanged
+- card bottom edge unchanged
+- card-to-button gap unchanged
+
+ONLY CHANGE
+The visible card top is moved down with an adaptive bounded inset:
+clamp(36px, 5.5dvh, 52px)
+
+On the measured 848px viewport this equals 46.64px.
+Examples across viewport heights:
+{667: 36.69, 740: 40.7, 780: 42.9, 848: 46.64, 874: 48.07, 932: 51.26}
+
+This is responsive, not tied to a particular iPhone model or screen size.
+
+UNCHANGED
+Safari/browser V15
+Android clean V2 behavior
+all 30 pause texts/order
+daily unlock logic
+navigation/localStorage
+backgrounds/typography
+button dimensions/style
+icons/manifest
+
+Locked V15 master SHA-256:
+fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872
