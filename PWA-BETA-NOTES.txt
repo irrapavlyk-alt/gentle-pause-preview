@@ -1,26 +1,31 @@
-Gentle Pause — V15 PWA BETA v3
+Gentle Pause — V15 PWA BETA v4
 
 LOCKED MASTER SHA-256:
 fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872
 
-ONLY FUNCTIONAL CHANGE FROM PWA BETA v2:
-- Installed mobile PWA / standalone mode only:
-  .stage and .screen are no longer height-constrained by 100dvh.
-  They fill the fixed inset:0 app viewport, allowing the existing grid
-  to give the newly available vertical room to the card.
-- Existing safe-area padding is unchanged.
-- Safari/browser layout is unchanged.
-- Service-worker cache version bumped beta-v2 -> beta-v3.
+BASE:
+PWA Beta v2 (clean baseline; ineffective v3 override is NOT carried forward).
 
-NOT CHANGED:
-- 30 Pause texts or order
+ONLY LAYOUT CHANGE:
+- Mobile installed standalone PWA only:
+  .stage and .screen use 100vh instead of the V15 100dvh constraint.
+- Reason: iOS/WebKit installed-PWA viewport quirk can make 100dvh exclude the
+  bottom safe-area, creating excess apparent space below the product UI.
+- Existing .frame padding with env(safe-area-inset-bottom) remains unchanged,
+  so the Home Indicator remains protected.
+
+UNCHANGED:
+- Safari/browser V15 CSS and geometry
+- card/button styling and spacing rules
+- 30 Pause texts/order
 - Welcome / Today / Pause / Tomorrow / Final workflow
-- local calendar unlock logic
+- local calendar logic
 - localStorage progress
-- navigation behavior
-- typography
-- background
-- buttons
-- approved icon assets
+- navigation
+- typography/background
+- approved icons
+- manifest
 - desktop CSS
-- browser/Safari V15 geometry
+
+SERVICE WORKER:
+- cache name beta-v2 -> beta-v4 only.

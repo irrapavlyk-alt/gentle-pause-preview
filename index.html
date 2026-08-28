@@ -79,18 +79,18 @@ a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
 html::-webkit-scrollbar,body::-webkit-scrollbar,.stage::-webkit-scrollbar,
 .screen::-webkit-scrollbar,.frame::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 
-/* ===== PWA STANDALONE GEOMETRY — BETA V3 =====
-   Browser/Safari geometry stays exactly as V15.
-   In installed mobile PWA mode, the fixed app shell fills the full standalone
-   viewport via inset:0 instead of being constrained by 100dvh. The existing
-   safe-area padding remains in force, so the Home Indicator stays protected.
-   The extra vertical room is automatically given to the card row. */
+/* ===== PWA STANDALONE GEOMETRY — BETA V4 =====
+   Standalone mobile only. Safari/browser V15 geometry is untouched.
+   iOS installed PWAs can report 100dvh shorter than the physical standalone
+   viewport by the bottom safe-area. In standalone mode 100vh includes that
+   area, while the existing .frame safe-area padding still keeps controls
+   above the Home Indicator. */
 @media (display-mode: standalone) and (max-width:799px){
   .stage,
   .screen{
-    height:auto;
-    min-height:0;
-    max-height:none;
+    height:100vh;
+    min-height:100vh;
+    max-height:100vh;
   }
 }
 
