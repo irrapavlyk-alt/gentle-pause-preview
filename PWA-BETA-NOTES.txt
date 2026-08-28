@@ -1,31 +1,37 @@
-Gentle Pause — V15 PWA BETA v4
+Gentle Pause — V15 PWA BETA V5
+Responsive standalone geometry test
 
-LOCKED MASTER SHA-256:
+BASELINE
+- Built from clean PWA Beta V2.
+- V3 and V4 geometry overrides are not carried forward.
+
+LOCKED MASTER SHA-256
 fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872
 
-BASE:
-PWA Beta v2 (clean baseline; ineffective v3 override is NOT carried forward).
+V5 CHANGES — STANDALONE MOBILE ONLY
+1. Detect installed-app mode using display-mode: standalone with
+   navigator.standalone fallback for iOS.
+2. Read the live Visual Viewport height when available; fall back to innerHeight.
+3. Store that measured height in --pwa-vh.
+4. Use the measured height only for .stage/.screen in installed mobile PWA mode.
+5. Keep the existing CSS Grid model:
+   card minmax(0,1fr) + 50px button + 8px gap.
+6. Keep device-provided safe areas via env(safe-area-inset-top/right/bottom/left).
+7. Recalculate on viewport resize, orientation change, VisualViewport changes,
+   and when the PWA returns to the foreground.
+8. Optional diagnostic mode: append ?layoutdebug=1 to show measured viewport,
+   frame/card/button heights and computed frame padding. It is invisible otherwise.
 
-ONLY LAYOUT CHANGE:
-- Mobile installed standalone PWA only:
-  .stage and .screen use 100vh instead of the V15 100dvh constraint.
-- Reason: iOS/WebKit installed-PWA viewport quirk can make 100dvh exclude the
-  bottom safe-area, creating excess apparent space below the product UI.
-- Existing .frame padding with env(safe-area-inset-bottom) remains unchanged,
-  so the Home Indicator remains protected.
-
-UNCHANGED:
-- Safari/browser V15 CSS and geometry
-- card/button styling and spacing rules
-- 30 Pause texts/order
-- Welcome / Today / Pause / Tomorrow / Final workflow
-- local calendar logic
+NOT CHANGED
+- Safari/browser V15 geometry
+- locked master
+- 30 texts/order
+- product workflow/navigation
+- calendar unlock logic
 - localStorage progress
-- navigation
-- typography/background
-- approved icons
-- manifest
-- desktop CSS
+- typography/background/button styling
+- icons/name/manifest
+- desktop layout
 
-SERVICE WORKER:
-- cache name beta-v2 -> beta-v4 only.
+SERVICE WORKER
+- cache name beta-v2 -> beta-v5.

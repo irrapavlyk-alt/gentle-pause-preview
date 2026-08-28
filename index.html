@@ -79,20 +79,50 @@ a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
 html::-webkit-scrollbar,body::-webkit-scrollbar,.stage::-webkit-scrollbar,
 .screen::-webkit-scrollbar,.frame::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 
-/* ===== PWA STANDALONE GEOMETRY — BETA V4 =====
-   Standalone mobile only. Safari/browser V15 geometry is untouched.
-   iOS installed PWAs can report 100dvh shorter than the physical standalone
-   viewport by the bottom safe-area. In standalone mode 100vh includes that
-   area, while the existing .frame safe-area padding still keeps controls
-   above the Home Indicator. */
-@media (display-mode: standalone) and (max-width:799px){
-  .stage,
-  .screen{
-    height:100vh;
-    min-height:100vh;
-    max-height:100vh;
+/* ===== PWA STANDALONE RESPONSIVE GEOMETRY — BETA V5 =====
+   Applies ONLY to an installed mobile PWA.
+   Safari/browser retains the locked V15 geometry.
+
+   --pwa-vh is set from the live visual viewport (with innerHeight fallback).
+   Grid allocation:
+     card = minmax(0, 1fr)
+     button = 50px
+     gap = 8px
+   Device safe areas remain supplied by env(safe-area-inset-*).
+*/
+@media (max-width:799px){
+  html.pwa-standalone .stage,
+  html.pwa-standalone .screen{
+    height:var(--pwa-vh,100dvh);
+    min-height:var(--pwa-vh,100dvh);
+    max-height:var(--pwa-vh,100dvh);
+  }
+
+  html.pwa-standalone .frame{
+    padding:
+      max(6px,env(safe-area-inset-top))
+      max(7px,env(safe-area-inset-right))
+      max(7px,env(safe-area-inset-bottom))
+      max(7px,env(safe-area-inset-left));
+    grid-template-rows:minmax(0,1fr) 50px;
+    gap:8px;
   }
 }
+
+/* Diagnostic overlay exists only when explicitly requested with ?layoutdebug=1. */
+#pwa-layout-debug{
+  display:none;
+  position:fixed;
+  left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));
+  z-index:2147483647;
+  padding:8px 10px;
+  background:rgba(0,0,0,.78);
+  color:#fff;
+  font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;
+  white-space:pre-wrap;
+  pointer-events:none;
+}
+html.pwa-layout-debug #pwa-layout-debug{display:block}
 
 /* Short-height phones keep the same locked outer rectangle. */
 @media(max-height:740px){
@@ -343,6 +373,14 @@ body.v12-preview-mode .frame{
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Gentle Pause"/>
+<script>
+(function(){
+  var standalone =
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+    window.navigator.standalone === true;
+  if (standalone) document.documentElement.classList.add('pwa-standalone');
+})();
+</script>
 </head>
 <body>
 <div class="stage">
@@ -1795,5 +1833,58 @@ body.v12-preview-mode .frame{
 
 <!-- PWA BETA WRAPPER: service-worker registration only -->
 <script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));}</script>
+<div id="pwa-layout-debug" aria-hidden="true"></div>
+<script>
+(function(){
+  if (!document.documentElement.classList.contains('pwa-standalone')) return;
+
+  var root = document.documentElement;
+  var vv = window.visualViewport;
+  var debug = new URLSearchParams(window.location.search).get('layoutdebug') === '1';
+  if (debug) root.classList.add('pwa-layout-debug');
+
+  function viewportHeight(){
+    var h = vv && vv.height ? vv.height : window.innerHeight;
+    return Math.round(h);
+  }
+
+  function sync(){
+    var h = viewportHeight();
+    if (h > 0) root.style.setProperty('--pwa-vh', h + 'px');
+
+    if (debug){
+      var frame = document.querySelector('.screen:target .frame') ||
+                  document.querySelector('#welcome .frame') ||
+                  document.querySelector('.frame');
+      var card = frame && frame.querySelector('.card');
+      var button = frame && frame.querySelector('.btn,.button,button,a[role="button"]');
+      var out = document.getElementById('pwa-layout-debug');
+      var cs = frame ? getComputedStyle(frame) : null;
+      out.textContent = [
+        'standalone: true',
+        'innerHeight: ' + window.innerHeight,
+        'visualViewport.height: ' + (vv ? vv.height.toFixed(1) : 'n/a'),
+        '--pwa-vh: ' + h,
+        'frame: ' + (frame ? Math.round(frame.getBoundingClientRect().height) : 'n/a'),
+        'card: ' + (card ? Math.round(card.getBoundingClientRect().height) : 'n/a'),
+        'button: ' + (button ? Math.round(button.getBoundingClientRect().height) : 'n/a'),
+        'padding-top: ' + (cs ? cs.paddingTop : 'n/a'),
+        'padding-bottom: ' + (cs ? cs.paddingBottom : 'n/a')
+      ].join('\n');
+    }
+  }
+
+  sync();
+  window.addEventListener('resize', sync, {passive:true});
+  window.addEventListener('orientationchange', sync, {passive:true});
+  if (vv){
+    vv.addEventListener('resize', sync, {passive:true});
+    vv.addEventListener('scroll', sync, {passive:true});
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) requestAnimationFrame(sync);
+  });
+})();
+</script>
 </body>
 </html>
