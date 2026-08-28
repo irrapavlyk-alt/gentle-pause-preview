@@ -102,6 +102,16 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,.stage::-webkit-scrollbar,
       grid-template-rows:minmax(0,1fr) 50px;
       gap:8px;
     }
+
+    /* Composition refinement only.
+       Shorten the visible card from the TOP while preserving its bottom edge,
+       the grid row, the controls, and the successful adaptive bottom geometry. */
+    .frame > .card{
+      --gp-card-top-trim:clamp(12px,1.8dvh,18px);
+      height:calc(100% - var(--gp-card-top-trim));
+      margin-top:var(--gp-card-top-trim);
+      align-self:end;
+    }
   }
 }
 /* Short-height phones keep the same locked outer rectangle. */

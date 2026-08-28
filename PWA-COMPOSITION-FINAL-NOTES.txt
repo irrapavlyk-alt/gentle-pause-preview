@@ -1,0 +1,37 @@
+GENTLE PAUSE — COMPOSITION FINAL
+
+BASE
+Successful Adaptive Final build.
+
+LOCKED LOWER RESULT
+The lower composition is intentionally unchanged:
+- adaptive iOS standalone reclaim logic unchanged
+- controls/button position unchanged
+- bottom safe-area handling unchanged
+- grid gap unchanged
+- controls height unchanged
+
+ONLY VISUAL CHANGE
+The card is shortened from its TOP edge only.
+
+Adaptive top trim:
+clamp(12px, 1.8dvh, 18px)
+
+This scales with the current viewport height:
+{740: 13.32, 780: 14.04, 848: 15.26, 874: 15.73, 932: 16.78}
+
+The bottom edge of the card stays in the same place as Adaptive Final,
+therefore the button does not move.
+
+UNCHANGED
+Safari/browser V15
+Android behavior
+all pause copy/order
+daily unlock logic
+navigation/localStorage
+backgrounds/typography
+button dimensions/style
+icons/manifest
+
+Locked V15 master SHA-256:
+fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872
