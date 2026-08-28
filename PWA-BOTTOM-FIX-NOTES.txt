@@ -1,0 +1,25 @@
+GENTLE PAUSE — IOS PWA BOTTOM-SAFE FIX
+
+Built from clean PWA Beta V2. No V4/V5/V6/final geometry carried forward.
+Locked V15 master SHA-256: fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872
+
+Single bug fix:
+- keep iOS standalone shell at the measured safe 100dvh/innerHeight
+- do NOT extend the shell into the physical Home Indicator region
+- preserve env(safe-area-inset-bottom)
+- remove only the duplicated top safe-area padding, because Diagnostic V1
+  proved the iOS standalone viewport already excluded that top system area
+
+Measured iPhone expected geometry:
+100dvh = 848px
+top design padding = 6px
+card = 750px
+gap = 8px
+controls = 50px
+bottom safe area = 34px
+controls bottom = 814px
+=> button remains fully inside the safe viewport; no clipping.
+
+Unaffected:
+Safari/browser V15, Android V2, copy, logic, navigation, localStorage,
+typography, backgrounds, buttons, icons, manifest.
