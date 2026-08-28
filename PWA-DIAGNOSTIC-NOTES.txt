@@ -1,0 +1,28 @@
+Gentle Pause — PWA DIAGNOSTIC V1
+
+PURPOSE
+Measure actual installed-iOS-PWA viewport and safe-area geometry before the next
+layout build. This is NOT a design iteration.
+
+BASE
+Clean PWA Beta V2.
+
+LOCKED MASTER SHA-256
+fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872
+
+GEOMETRY
+No V3, V4, or V5 geometry override is included. Browser/product geometry remains
+the clean V2 baseline.
+
+DIAGNOSTIC
+In standalone only, an overlay reports screen/available/inner/client viewport
+sizes, 100vh/100dvh probes, VisualViewport values, safe-area env values, frame
+grid/padding, card/button rectangles, and bottom-space deltas.
+
+IOS INSTALL METADATA
+apple-mobile-web-app-status-bar-style=black-translucent is explicitly present
+before installation so the diagnostic does not reproduce WebKit bug 316008's
+known missing-install-metadata condition.
+
+SERVICE WORKER
+Cache: gentle-pause-pwa-diagnostic-v1

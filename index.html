@@ -79,51 +79,6 @@ a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
 html::-webkit-scrollbar,body::-webkit-scrollbar,.stage::-webkit-scrollbar,
 .screen::-webkit-scrollbar,.frame::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 
-/* ===== PWA STANDALONE RESPONSIVE GEOMETRY — BETA V5 =====
-   Applies ONLY to an installed mobile PWA.
-   Safari/browser retains the locked V15 geometry.
-
-   --pwa-vh is set from the live visual viewport (with innerHeight fallback).
-   Grid allocation:
-     card = minmax(0, 1fr)
-     button = 50px
-     gap = 8px
-   Device safe areas remain supplied by env(safe-area-inset-*).
-*/
-@media (max-width:799px){
-  html.pwa-standalone .stage,
-  html.pwa-standalone .screen{
-    height:var(--pwa-vh,100dvh);
-    min-height:var(--pwa-vh,100dvh);
-    max-height:var(--pwa-vh,100dvh);
-  }
-
-  html.pwa-standalone .frame{
-    padding:
-      max(6px,env(safe-area-inset-top))
-      max(7px,env(safe-area-inset-right))
-      max(7px,env(safe-area-inset-bottom))
-      max(7px,env(safe-area-inset-left));
-    grid-template-rows:minmax(0,1fr) 50px;
-    gap:8px;
-  }
-}
-
-/* Diagnostic overlay exists only when explicitly requested with ?layoutdebug=1. */
-#pwa-layout-debug{
-  display:none;
-  position:fixed;
-  left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));
-  z-index:2147483647;
-  padding:8px 10px;
-  background:rgba(0,0,0,.78);
-  color:#fff;
-  font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;
-  white-space:pre-wrap;
-  pointer-events:none;
-}
-html.pwa-layout-debug #pwa-layout-debug{display:block}
-
 /* Short-height phones keep the same locked outer rectangle. */
 @media(max-height:740px){
   .frame{grid-template-rows:minmax(0,1fr) 46px;gap:6px}
@@ -373,14 +328,30 @@ body.v12-preview-mode .frame{
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Gentle Pause"/>
-<script>
-(function(){
-  var standalone =
-    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
-    window.navigator.standalone === true;
-  if (standalone) document.documentElement.classList.add('pwa-standalone');
-})();
-</script>
+
+<style id="pwa-diagnostic-v1-css">
+#gp-pwa-diagnostic {
+  display:none;
+  position:fixed;
+  z-index:2147483647;
+  left:8px;
+  right:8px;
+  top:max(8px, env(safe-area-inset-top, 0px));
+  max-height:72vh;
+  overflow:auto;
+  box-sizing:border-box;
+  padding:10px 12px;
+  border-radius:10px;
+  background:rgba(0,0,0,.84);
+  color:#fff;
+  font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;
+  white-space:pre-wrap;
+  -webkit-user-select:text;
+  user-select:text;
+  pointer-events:auto;
+}
+html.gp-diag-on #gp-pwa-diagnostic { display:block; }
+</style>
 </head>
 <body>
 <div class="stage">
@@ -1833,57 +1804,113 @@ body.v12-preview-mode .frame{
 
 <!-- PWA BETA WRAPPER: service-worker registration only -->
 <script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));}</script>
-<div id="pwa-layout-debug" aria-hidden="true"></div>
-<script>
+
+<div id="gp-pwa-diagnostic" aria-live="polite"></div>
+<script id="pwa-diagnostic-v1-js">
 (function(){
-  if (!document.documentElement.classList.contains('pwa-standalone')) return;
+  var standalone =
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+    window.navigator.standalone === true;
 
-  var root = document.documentElement;
-  var vv = window.visualViewport;
-  var debug = new URLSearchParams(window.location.search).get('layoutdebug') === '1';
-  if (debug) root.classList.add('pwa-layout-debug');
+  /* Diagnostic build intentionally shows the panel only in installed standalone mode. */
+  if (!standalone) return;
+  document.documentElement.classList.add('gp-diag-on');
 
-  function viewportHeight(){
-    var h = vv && vv.height ? vv.height : window.innerHeight;
-    return Math.round(h);
+  var probe = document.createElement('div');
+  probe.setAttribute('aria-hidden','true');
+  probe.style.cssText =
+    'position:fixed;visibility:hidden;pointer-events:none;' +
+    'padding-top:env(safe-area-inset-top,0px);' +
+    'padding-right:env(safe-area-inset-right,0px);' +
+    'padding-bottom:env(safe-area-inset-bottom,0px);' +
+    'padding-left:env(safe-area-inset-left,0px);';
+  document.body.appendChild(probe);
+
+  function rect(el){
+    if(!el) return null;
+    var r=el.getBoundingClientRect();
+    return {top:r.top,bottom:r.bottom,height:r.height,left:r.left,right:r.right,width:r.width};
+  }
+  function px(v){ return Math.round(v*10)/10; }
+  function fmtRect(name,r){
+    if(!r) return name+': n/a';
+    return name+': top '+px(r.top)+' / bottom '+px(r.bottom)+' / h '+px(r.height);
+  }
+  function visibleScreen(){
+    var screens=[].slice.call(document.querySelectorAll('.screen'));
+    return screens.find(function(el){
+      var cs=getComputedStyle(el);
+      var r=el.getBoundingClientRect();
+      return cs.display!=='none' && cs.visibility!=='hidden' && r.height>0;
+    }) || document.querySelector('.screen');
+  }
+  function update(){
+    var vv=window.visualViewport;
+    var root=document.documentElement;
+    var body=document.body;
+    var screenEl=visibleScreen();
+    var frame=screenEl && screenEl.querySelector('.frame');
+    var card=screenEl && screenEl.querySelector('.card');
+    var controls=screenEl && (
+      screenEl.querySelector('.controls') ||
+      screenEl.querySelector('.actions') ||
+      screenEl.querySelector('.cta-row')
+    );
+    var button=screenEl && (
+      screenEl.querySelector('button') ||
+      screenEl.querySelector('.btn') ||
+      screenEl.querySelector('[role="button"]')
+    );
+    var ps=getComputedStyle(probe);
+    var fcs=frame ? getComputedStyle(frame) : null;
+    var out=document.getElementById('gp-pwa-diagnostic');
+
+    var lines=[
+      'GENTLE PAUSE — PWA DIAGNOSTIC V1',
+      'standalone: '+standalone,
+      'navigator.standalone: '+String(window.navigator.standalone),
+      'display-mode standalone: '+String(!!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)),
+      '',
+      'screen.width × height: '+screen.width+' × '+screen.height,
+      'screen.availWidth × availHeight: '+screen.availWidth+' × '+screen.availHeight,
+      'devicePixelRatio: '+window.devicePixelRatio,
+      'innerWidth × innerHeight: '+window.innerWidth+' × '+window.innerHeight,
+      'documentElement.client: '+root.clientWidth+' × '+root.clientHeight,
+      'body.client: '+body.clientWidth+' × '+body.clientHeight,
+      '100vh probe: '+px((function(){var e=document.createElement("div");e.style.cssText="position:fixed;visibility:hidden;height:100vh";document.body.appendChild(e);var h=e.getBoundingClientRect().height;e.remove();return h})()),
+      '100dvh probe: '+px((function(){var e=document.createElement("div");e.style.cssText="position:fixed;visibility:hidden;height:100dvh";document.body.appendChild(e);var h=e.getBoundingClientRect().height;e.remove();return h})()),
+      'visualViewport.width × height: '+(vv ? px(vv.width)+' × '+px(vv.height) : 'n/a'),
+      'visualViewport.offsetTop: '+(vv ? px(vv.offsetTop) : 'n/a'),
+      'visualViewport.pageTop: '+(vv ? px(vv.pageTop) : 'n/a'),
+      '',
+      'safe top/right/bottom/left: '+[ps.paddingTop,ps.paddingRight,ps.paddingBottom,ps.paddingLeft].join(' / '),
+      'frame padding top/bottom: '+(fcs ? fcs.paddingTop+' / '+fcs.paddingBottom : 'n/a'),
+      'frame grid rows: '+(fcs ? fcs.gridTemplateRows : 'n/a'),
+      'frame gap: '+(fcs ? fcs.gap : 'n/a'),
+      '',
+      fmtRect('screen',rect(screenEl)),
+      fmtRect('frame',rect(frame)),
+      fmtRect('card',rect(card)),
+      fmtRect('controls',rect(controls)),
+      fmtRect('button',rect(button)),
+      '',
+      'screen.height - innerHeight: '+px(screen.height-window.innerHeight),
+      'innerHeight - visualViewport.height: '+(vv ? px(window.innerHeight-vv.height) : 'n/a'),
+      'viewport bottom - button bottom: '+(button ? px(window.innerHeight-rect(button).bottom) : 'n/a')
+    ];
+    out.textContent=lines.join('\n');
   }
 
-  function sync(){
-    var h = viewportHeight();
-    if (h > 0) root.style.setProperty('--pwa-vh', h + 'px');
-
-    if (debug){
-      var frame = document.querySelector('.screen:target .frame') ||
-                  document.querySelector('#welcome .frame') ||
-                  document.querySelector('.frame');
-      var card = frame && frame.querySelector('.card');
-      var button = frame && frame.querySelector('.btn,.button,button,a[role="button"]');
-      var out = document.getElementById('pwa-layout-debug');
-      var cs = frame ? getComputedStyle(frame) : null;
-      out.textContent = [
-        'standalone: true',
-        'innerHeight: ' + window.innerHeight,
-        'visualViewport.height: ' + (vv ? vv.height.toFixed(1) : 'n/a'),
-        '--pwa-vh: ' + h,
-        'frame: ' + (frame ? Math.round(frame.getBoundingClientRect().height) : 'n/a'),
-        'card: ' + (card ? Math.round(card.getBoundingClientRect().height) : 'n/a'),
-        'button: ' + (button ? Math.round(button.getBoundingClientRect().height) : 'n/a'),
-        'padding-top: ' + (cs ? cs.paddingTop : 'n/a'),
-        'padding-bottom: ' + (cs ? cs.paddingBottom : 'n/a')
-      ].join('\n');
-    }
+  update();
+  requestAnimationFrame(update);
+  setTimeout(update,250);
+  setTimeout(update,1000);
+  window.addEventListener('resize',update,{passive:true});
+  window.addEventListener('orientationchange',function(){setTimeout(update,250)},{passive:true});
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',update,{passive:true});
+    window.visualViewport.addEventListener('scroll',update,{passive:true});
   }
-
-  sync();
-  window.addEventListener('resize', sync, {passive:true});
-  window.addEventListener('orientationchange', sync, {passive:true});
-  if (vv){
-    vv.addEventListener('resize', sync, {passive:true});
-    vv.addEventListener('scroll', sync, {passive:true});
-  }
-  document.addEventListener('visibilitychange', function(){
-    if (!document.hidden) requestAnimationFrame(sync);
-  });
 })();
 </script>
 </body>
