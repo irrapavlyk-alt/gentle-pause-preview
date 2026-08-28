@@ -1,0 +1,48 @@
+Gentle Pause — PWA BETA V6 CANDIDATE
+Adaptive standalone safe-area normalization
+
+BASE
+- Clean PWA Beta V2.
+- V3/V4/V5 geometry experiments are not carried forward.
+
+LOCKED MASTER SHA-256
+fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872
+
+DIAGNOSTIC FACT USED
+Measured iPhone standalone:
+screen.height 896
+innerHeight / 100dvh / visualViewport.height 848
+safe-area-inset-top 48
+safe-area-inset-bottom 34
+Therefore screen.height - innerHeight == safe-area-inset-top.
+
+V6 RULE
+- No device model, screen size, or 48px correction is hard-coded.
+- Only on iOS Home Screen (navigator.standalone === true), runtime measures:
+  1) screen.height - innerHeight
+  2) env(safe-area-inset-top)
+- If those two measured values match within 2px, WebKit has already excluded
+  the top safe-area from the standalone viewport.
+- Only then the frame stops reserving that top inset a second time and uses
+  the original 6px design padding.
+- Bottom safe-area remains fully protected with env(safe-area-inset-bottom).
+- Android does not receive the iOS correction.
+- Safari/browser does not receive the correction.
+- Existing Grid remains: card minmax(0,1fr), controls 50px, gap 8px.
+
+MODEL GEOMETRY CHECKS
+- Measured iPhone 414x896: correction=True, card≈750px, protected-bottom=34px
+- Compact iPhone-like: correction=True, card≈670px, protected-bottom=34px
+- Large iPhone-like: correction=True, card≈775px, protected-bottom=34px
+- Android full viewport: correction=False, card≈844px, protected-bottom=7px
+- Android with top inset: correction=False, card≈802px, protected-bottom=7px
+
+NOT CHANGED
+- Locked V15 master
+- 30 texts/order
+- product logic/navigation
+- local calendar unlock logic
+- localStorage
+- typography/background/button styling
+- icons/name/manifest
+- desktop geometry
