@@ -79,23 +79,21 @@ a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
 html::-webkit-scrollbar,body::-webkit-scrollbar,.stage::-webkit-scrollbar,
 .screen::-webkit-scrollbar,.frame::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 
-/* ===== GENTLE PAUSE — IOS PWA BOTTOM-SAFE FIX =====
-   Scope: installed iOS PWA only. Safari/browser and Android remain V2.
-   Diagnostic proved that iOS standalone's 100dvh/innerHeight already excludes
-   the 48px top system area, while env(safe-area-inset-top) still reports it.
-   Therefore V2 was reserving the top system area twice.
-   We keep the SAFE 100dvh shell (so controls cannot enter the Home Indicator
-   region) and remove only that duplicated top inset.
+/* ===== GENTLE PAUSE — ADAPTIVE IOS STANDALONE GEOMETRY =====
+   Browser/Safari and Android stay on locked V15 / clean V2 behavior.
+   iOS Home Screen uses the safe dynamic viewport as the baseline, then
+   reclaims only a measured fraction of the runtime gap. The reclaim is
+   capped by the measured bottom safe inset so controls remain visible.
+   No device model, screen height, or card height is hard-coded.
 */
 @media (display-mode: standalone) and (max-width:799px){
   @supports (-webkit-touch-callout:none){
     .stage,
     .screen{
-      height:100dvh;
-      min-height:100dvh;
-      max-height:100dvh;
+      height:calc(100dvh + var(--gp-pwa-reclaim, 0px));
+      min-height:calc(100dvh + var(--gp-pwa-reclaim, 0px));
+      max-height:calc(100dvh + var(--gp-pwa-reclaim, 0px));
     }
-
     .frame{
       padding-top:6px;
       padding-right:max(7px,env(safe-area-inset-right,0px));
@@ -1807,5 +1805,36 @@ body.v12-preview-mode .frame{
 
 <!-- PWA BETA WRAPPER: service-worker registration only -->
 <script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));}</script>
+
+<script>
+(function(){
+  if (window.navigator.standalone !== true) return;
+  function readSafeBottom(){
+    var probe=document.createElement('div');
+    probe.setAttribute('aria-hidden','true');
+    probe.style.cssText='position:fixed;visibility:hidden;pointer-events:none;padding-bottom:env(safe-area-inset-bottom,0px);';
+    document.body.appendChild(probe);
+    var v=parseFloat(getComputedStyle(probe).paddingBottom)||0;
+    probe.remove();
+    return v;
+  }
+  function apply(){
+    var webH=window.innerHeight||document.documentElement.clientHeight||0;
+    var physicalH=(window.screen&&window.screen.height)||webH;
+    var systemGap=Math.max(0,physicalH-webH);
+    var safeBottom=readSafeBottom();
+    var proportional=systemGap*0.66;
+    var safeCap=Math.max(0,safeBottom-6);
+    var reclaim=Math.max(0,Math.min(proportional,safeCap));
+    document.documentElement.style.setProperty('--gp-pwa-reclaim',reclaim.toFixed(2)+'px');
+  }
+  apply();
+  requestAnimationFrame(apply);
+  window.addEventListener('resize',apply,{passive:true});
+  window.addEventListener('orientationchange',function(){setTimeout(apply,250);},{passive:true});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)requestAnimationFrame(apply);});
+})();
+</script>
+
 </body>
 </html>

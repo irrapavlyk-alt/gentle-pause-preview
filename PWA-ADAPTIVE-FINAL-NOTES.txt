@@ -1,0 +1,30 @@
+GENTLE PAUSE — ADAPTIVE FINAL IOS PWA GEOMETRY
+
+BASE
+Fresh PWA Beta V2. No V4/V5/V6/previous-final geometry code carried forward.
+
+LOCKED MASTER SHA-256
+fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872
+
+ONLY CHANGE
+Installed iOS Home Screen geometry. Runtime measures screen.height, innerHeight and safe-area-inset-bottom. It reclaims 66% of the actual runtime gap, capped at safeBottom - 6px. Thus the composition moves between the two tested extremes proportionally, while controls remain inside the visible web viewport.
+
+No device model, screen height, fixed card height, or iPhone-specific dimension is hard-coded.
+
+Measured diagnostic prediction
+- web viewport: 848px
+- physical screen: 896px
+- runtime gap: 48px
+- safe bottom: 34px
+- adaptive reclaim: 28px
+- predicted card: 778px
+- controls remain 6px inside visible web viewport
+
+Representative QA
+- measured iPhone: gap=48px, reclaim=28.0px, card≈778.0px, visible reserve≈6.0px
+- compact iPhone-like: gap=44px, reclaim=28.0px, card≈710.0px, visible reserve≈6.0px
+- large iPhone-like: gap=58px, reclaim=28.0px, card≈804.0px, visible reserve≈6.0px
+- no-gap runtime: gap=0px, reclaim=0.0px, card≈746.0px, visible reserve≈34.0px
+
+UNAFFECTED
+Safari/browser V15; Android V2; all 30 texts/order; daily unlock logic; navigation; localStorage; backgrounds; typography; button dimensions/style; icons; manifest.
