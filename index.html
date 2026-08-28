@@ -79,18 +79,29 @@ a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
 html::-webkit-scrollbar,body::-webkit-scrollbar,.stage::-webkit-scrollbar,
 .screen::-webkit-scrollbar,.frame::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 
-/* ===== PWA STANDALONE SAFE-AREA NORMALIZATION — V6 CANDIDATE =====
-   Browser/Safari geometry stays on locked V15 rules.
-   This correction is NOT device/model-specific. JS enables it only when an
-   installed iOS PWA proves at runtime that its viewport has already excluded
-   the top safe-area inset (WebKit installed-PWA viewport behavior).
+/* ===== GENTLE PAUSE — FINAL INSTALLED-PWA GEOMETRY =====
+   Safari/browser remains on locked V15 geometry.
+   Android remains on the clean V2 dynamic-viewport geometry.
+   iOS Home Screen uses standalone 100vh (full screen coordinate space);
+   safe areas are then reserved once inside that shell.
 */
-@media (max-width:799px){
-  html.pwa-top-safe-already-excluded .frame{
-    padding-top:6px;
-    padding-right:max(7px,env(safe-area-inset-right,0px));
-    padding-bottom:max(7px,env(safe-area-inset-bottom,0px));
-    padding-left:max(7px,env(safe-area-inset-left,0px));
+@media (display-mode: standalone) and (max-width:799px){
+  @supports (-webkit-touch-callout:none){
+    .stage,
+    .screen{
+      height:100vh;
+      min-height:100vh;
+      max-height:100vh;
+    }
+
+    .frame{
+      padding-top:max(6px,env(safe-area-inset-top,0px));
+      padding-right:max(7px,env(safe-area-inset-right,0px));
+      padding-bottom:max(15px,calc(env(safe-area-inset-bottom,0px) + 8px));
+      padding-left:max(7px,env(safe-area-inset-left,0px));
+      grid-template-rows:minmax(0,1fr) 50px;
+      gap:8px;
+    }
   }
 }
 /* Short-height phones keep the same locked outer rectangle. */
@@ -1794,48 +1805,5 @@ body.v12-preview-mode .frame{
 
 <!-- PWA BETA WRAPPER: service-worker registration only -->
 <script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));}</script>
-<script id="pwa-safe-area-normalizer-v6">
-(function(){
-  var isIOSHomeScreen = window.navigator.standalone === true;
-  if (!isIOSHomeScreen) return;
-
-  function measure(){
-    var probe = document.createElement('div');
-    probe.setAttribute('aria-hidden','true');
-    probe.style.cssText =
-      'position:fixed;visibility:hidden;pointer-events:none;' +
-      'padding-top:env(safe-area-inset-top,0px);';
-    document.body.appendChild(probe);
-
-    var safeTop = parseFloat(getComputedStyle(probe).paddingTop) || 0;
-    probe.remove();
-
-    var excluded = Math.max(0, window.screen.height - window.innerHeight);
-    var tolerance = 2;
-
-    /* Enable only when the measured missing viewport height matches the
-       measured top safe-area. This is the exact relationship observed in the
-       diagnostic (48px == 48px), but no 48px value is hard-coded. */
-    var topAlreadyExcluded =
-      safeTop > 0 &&
-      Math.abs(excluded - safeTop) <= tolerance;
-
-    document.documentElement.classList.toggle(
-      'pwa-top-safe-already-excluded',
-      topAlreadyExcluded
-    );
-  }
-
-  measure();
-  requestAnimationFrame(measure);
-  window.addEventListener('resize',measure,{passive:true});
-  window.addEventListener('orientationchange',function(){
-    setTimeout(measure,250);
-  },{passive:true});
-  document.addEventListener('visibilitychange',function(){
-    if(!document.hidden) requestAnimationFrame(measure);
-  });
-})();
-</script>
 </body>
 </html>

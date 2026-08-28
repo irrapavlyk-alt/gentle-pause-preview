@@ -1,0 +1,27 @@
+GENTLE PAUSE — PWA FINAL
+Built from a fresh extraction of PWA Beta V2.
+
+Locked V15 master SHA-256:
+fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872
+
+Final iOS Home Screen geometry:
+- 100vh full standalone shell
+- safe-area top reserved once
+- safe-area bottom reserved once + 8px visual breathing room
+- card remains flexible 1fr
+- controls remain 50px
+- gap remains 8px
+
+Measured iPhone prediction from Diagnostic V1:
+- screen: 896px
+- safe top: 48px
+- safe bottom: 34px
+- final protected area below controls: 42px
+- predicted card height: 748px
+
+Scope:
+- Safari/browser V15 geometry untouched
+- Android stays on clean V2 geometry
+- no device dimensions or iPhone-specific pixel values hard-coded
+- all pause copy, order, unlock logic, navigation, localStorage, typography,
+  backgrounds, icons and manifest unchanged
