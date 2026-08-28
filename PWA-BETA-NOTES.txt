@@ -1,0 +1,18 @@
+Gentle Pause — V15 PWA BETA v2
+
+BASE LOCKED MASTER SHA-256:
+fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872
+
+PWA v2 changes only:
+- approved Gentle Pause app icon
+- full-bleed PNG assets: 180, 192, 512, 1024 px
+- manifest icon metadata refreshed
+- service-worker cache bumped beta-v1 -> beta-v2
+
+NOT CHANGED:
+- 30 Pause texts/order
+- Welcome / Today / Pause / Tomorrow / Final workflow
+- local calendar unlock logic
+- localStorage progress
+- navigation
+- locked mobile design/geometry
