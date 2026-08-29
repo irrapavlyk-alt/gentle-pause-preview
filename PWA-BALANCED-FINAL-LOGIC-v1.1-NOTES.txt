@@ -1,0 +1,39 @@
+GENTLE PAUSE — BALANCED FINAL · LOGIC v1.1
+
+BASE
+Gentle-Pause-PWA-BALANCED-FINAL.zip
+
+VISUAL STATUS
+UNCHANGED. The approved Balanced Final geometry is frozen:
+- card top/bottom composition unchanged
+- button position unchanged
+- safe-area behavior unchanged
+- adaptive iOS standalone geometry unchanged
+- typography/backgrounds/buttons/icons unchanged
+
+ONLY PRODUCT-LOGIC CHANGES
+
+1. New local calendar day:
+   launch/resume -> TODAY'S PAUSE doorway.
+
+2. The doorway remains until the user taps "Open today's pause".
+   That action unlocks/opens exactly one new sequential pause and records
+   today's local calendar date.
+
+3. After today's pause has been opened:
+   any later launch/resume that same day -> newest unlocked pause directly.
+
+4. "Next pause will unfold tomorrow":
+   remains visible after "That's enough for today" in the current session,
+   but is no longer a launch/resume destination.
+
+5. iOS standalone resume:
+   visibilitychange + pageshow re-run the product entry logic, because
+   Home Screen apps can resume an existing document without a full reload.
+
+6. Skipped days:
+   unchanged. Only one next sequential pause unlocks on the next day of
+   engagement; skipped calendar days do not unlock multiple pauses.
+
+LOCKED MASTER
+SHA-256: fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872

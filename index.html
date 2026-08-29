@@ -1661,16 +1661,23 @@ body.v12-preview-mode .frame{
 
   function enterProduct(){
     if(!state.started) return show("welcome");
+
     if(state.completed){
       const candidate=screen(state.lastView)?state.lastView:"closing";
       return show(candidate);
     }
+
+    // A new local calendar day gets one doorway before the new pause is opened.
     if(isNewCalendarDay()) return show("daily-home");
-    const candidate=state.lastView;
-    if(candidate && candidate!=="welcome" && candidate!=="daily-home" && screen(candidate)){
-      return show(candidate);
-    }
+
+    // Once today's pause has been opened, every fresh launch/resume returns
+    // directly to the newest unlocked pause. "Tomorrow" is session-only.
     return show(`pause-${pad(Math.max(1,state.unlockedThrough))}`);
+  }
+
+  function resumeProduct(){
+    if(PREVIEW || document.hidden) return;
+    enterProduct();
   }
 
   // Welcome
@@ -1809,6 +1816,15 @@ body.v12-preview-mode .frame{
   }else{
     refreshNavigation();
     enterProduct();
+
+    // iOS Home Screen apps may resume the existing document instead of
+    // reloading it. Re-check the local calendar day whenever the app returns.
+    document.addEventListener("visibilitychange",()=>{
+      if(!document.hidden) requestAnimationFrame(resumeProduct);
+    });
+    window.addEventListener("pageshow",()=>{
+      requestAnimationFrame(resumeProduct);
+    });
   }
 })();
 </script>
