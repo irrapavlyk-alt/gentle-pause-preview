@@ -1,0 +1,45 @@
+GENTLE PAUSE — BALANCED FINAL · LOGIC v1.2
+
+BASE
+Gentle-Pause-PWA-BALANCED-FINAL-LOGIC-v1.1.zip
+
+ONLY CHANGE
+Initialization order of the existing iOS standalone geometry calculation.
+
+OLD ORDER
+product runtime chose/showed the first screen
+→ standalone geometry variable was calculated afterwards
+
+NEW ORDER
+standalone geometry is calculated first
+→ then product runtime chooses/shows the first screen
+
+WHY
+Welcome is the first screen on a clean Home Screen install, so it could appear
+before --gp-pwa-reclaim existed. Later screens already had the final geometry.
+
+SCOPE
+The same shared .frame/.card geometry now applies from the first visible frame
+to:
+- Welcome
+- Today's Pause doorway
+- all 30 Pause screens
+- all Tomorrow screens
+- Final / Closing screen
+
+UNCHANGED
+- approved Balanced Final geometry values
+- card top trim
+- button/control position
+- safe-area/reclaim formula
+- backgrounds / typography / copy
+- all pause texts/order
+- local-calendar unlock workflow
+- same-day resume logic
+- navigation/back/forward behavior
+- localStorage state model
+- preview harness
+- manifest/icons
+
+Locked V15 master SHA-256:
+fdd5f4eec19081d3e36a1f701dcdccdfc5ba18caee9480a931cdb39d4c259872

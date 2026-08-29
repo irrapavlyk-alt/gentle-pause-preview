@@ -1547,6 +1547,37 @@ body.v12-preview-mode .frame{
 </nav>
 
 
+<!-- PWA GEOMETRY BOOTSTRAP: before product runtime -->
+<script>
+(function(){
+  if (window.navigator.standalone !== true) return;
+  function readSafeBottom(){
+    var probe=document.createElement('div');
+    probe.setAttribute('aria-hidden','true');
+    probe.style.cssText='position:fixed;visibility:hidden;pointer-events:none;padding-bottom:env(safe-area-inset-bottom,0px);';
+    document.body.appendChild(probe);
+    var v=parseFloat(getComputedStyle(probe).paddingBottom)||0;
+    probe.remove();
+    return v;
+  }
+  function apply(){
+    var webH=window.innerHeight||document.documentElement.clientHeight||0;
+    var physicalH=(window.screen&&window.screen.height)||webH;
+    var systemGap=Math.max(0,physicalH-webH);
+    var safeBottom=readSafeBottom();
+    var proportional=systemGap*0.66;
+    var safeCap=Math.max(0,safeBottom-6);
+    var reclaim=Math.max(0,Math.min(proportional,safeCap));
+    document.documentElement.style.setProperty('--gp-pwa-reclaim',reclaim.toFixed(2)+'px');
+  }
+  apply();
+  requestAnimationFrame(apply);
+  window.addEventListener('resize',apply,{passive:true});
+  window.addEventListener('orientationchange',function(){setTimeout(apply,250);},{passive:true});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)requestAnimationFrame(apply);});
+})();
+</script>
+
 <script id="gentle-pause-v12-runtime">
 (function(){
   "use strict";
@@ -1833,35 +1864,6 @@ body.v12-preview-mode .frame{
 <!-- PWA BETA WRAPPER: service-worker registration only -->
 <script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));}</script>
 
-<script>
-(function(){
-  if (window.navigator.standalone !== true) return;
-  function readSafeBottom(){
-    var probe=document.createElement('div');
-    probe.setAttribute('aria-hidden','true');
-    probe.style.cssText='position:fixed;visibility:hidden;pointer-events:none;padding-bottom:env(safe-area-inset-bottom,0px);';
-    document.body.appendChild(probe);
-    var v=parseFloat(getComputedStyle(probe).paddingBottom)||0;
-    probe.remove();
-    return v;
-  }
-  function apply(){
-    var webH=window.innerHeight||document.documentElement.clientHeight||0;
-    var physicalH=(window.screen&&window.screen.height)||webH;
-    var systemGap=Math.max(0,physicalH-webH);
-    var safeBottom=readSafeBottom();
-    var proportional=systemGap*0.66;
-    var safeCap=Math.max(0,safeBottom-6);
-    var reclaim=Math.max(0,Math.min(proportional,safeCap));
-    document.documentElement.style.setProperty('--gp-pwa-reclaim',reclaim.toFixed(2)+'px');
-  }
-  apply();
-  requestAnimationFrame(apply);
-  window.addEventListener('resize',apply,{passive:true});
-  window.addEventListener('orientationchange',function(){setTimeout(apply,250);},{passive:true});
-  document.addEventListener('visibilitychange',function(){if(!document.hidden)requestAnimationFrame(apply);});
-})();
-</script>
 
 </body>
 </html>
